@@ -4,10 +4,47 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>QR Code Scanner</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                width: 100dvw;
+                height: 100dvh;
+                padding: 2ch;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                background-color: black;
+                gap: 1ch;
+            }
+
+            button {
+                border: 1px solid white;
+                width: 100%;
+                border-radius: 6px;
+                background-color: transparent;
+                margin: 0;
+                padding: 1ch;
+                font-size: 1rem;
+                font-family: sans-serif;
+                color: white;
+            }
+
+            video {
+                width: 100%;
+                flex-grow: 1;
+                border: 1px solid white;
+                border-radius: 6px;
+                overflow: hidden;
+            }
+        </style>
     </head>
     <body>
         <video></video>
-        <button id="scan-btn">Scan</button>
+        <button id="scan-btn">Tap to scan</button>
 
         <div id="result"></div>
 
@@ -20,16 +57,23 @@
             }
 
             const qrScanner = new QrScanner($("video"), onDetected, {
+                onDecodeError: () => {},
+                maxScansPerSecond: 1,
                 returnDetailedScanResult: true,
+                highlightScanRegion: true,
+                highlightCodeOutline: true,
             });
 
             function onDetected(result) {
-                $("#result").innerText = result.data;
-                qrScanner.stop();
+                // $("#result").innerText = result.data;
+                console.log(result);
+                // qrScanner.stop();
             }
 
             function scan() {
                 qrScanner.start();
+                $("#scan-btn").innerText = "Scanning...";
+                $("#scan-btn").disabled = true;
             }
 
             $("#scan-btn").addEventListener("click", () => scan());
