@@ -20,38 +20,67 @@
                 align-items: center;
                 background-color: black;
                 gap: 1ch;
+                font-family: sans-serif;
+                font-size: 1rem;
+                color: white;
             }
 
-            button {
-                border: 1px solid white;
+            #container {
                 width: 100%;
-                border-radius: 6px;
-                background-color: transparent;
-                margin: 0;
-                padding: 1ch;
-                font-size: 1rem;
-                font-family: sans-serif;
-                color: white;
+                aspect-ratio: 1;
+                border-radius: 1ch;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #message {
+                position: absolute;
             }
 
             video {
                 width: 100%;
-                flex-grow: 1;
-                border: 1px solid white;
-                border-radius: 6px;
+                object-fit: cover;
+                aspect-ratio: 1;
+            }
+
+            #result-bar {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            #result {
                 overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                max-width: 80%;
+            }
+
+            #checkmark {
+                visibility: hidden;
+                width: 3ch;
+                aspect-ratio: 1;
             }
         </style>
     </head>
     <body>
-        <video></video>
-        <button id="scan-btn">Tap to scan</button>
-
-        <div id="result"></div>
+        <div id="container">
+            <div id="message">Tap to scan</div>
+            <video></video>
+        </div>
+        <div id="result-bar">
+            <div id="result"></div>
+            <img src="check.svg" id="checkmark" />
+        </div>
 
         <script type="module">
             // https://github.com/nimiq/qr-scanner
             import QrScanner from "./qr-scanner.min.js";
+
+            let isScanning = false;
 
             function $(selector) {
                 return document.querySelector(selector);
@@ -61,23 +90,29 @@
                 onDecodeError: () => {},
                 maxScansPerSecond: 1,
                 returnDetailedScanResult: true,
-                highlightScanRegion: true,
-                highlightCodeOutline: true,
+                highlightScanRegion: false,
+                highlightCodeOutline: false,
             });
 
+            function isValid(code) {
+                return code.startsWith("https://marinm.net/");
+            }
+
             function onDetected(result) {
-                // $("#result").innerText = result.data;
-                console.log(result);
+                $("#result").innerText = result.data;
+                $("#checkmark").style.visibility = isValid(result.data)
+                    ? "visible"
+                    : "hidden";
                 // qrScanner.stop();
             }
 
-            function scan() {
+            $("video").addEventListener("click", () => {
+                if (isScanning) {
+                    return;
+                }
+                isScanning = true;
                 qrScanner.start();
-                $("#scan-btn").innerText = "Scanning...";
-                $("#scan-btn").disabled = true;
-            }
-
-            $("#scan-btn").addEventListener("click", () => scan());
+            });
         </script>
     </body>
 </html>
