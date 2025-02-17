@@ -6,32 +6,33 @@
         <title>QR Code Scanner</title>
     </head>
     <body>
-        <!-- Scanner code from
-		  -- https://github.com/nimiq/qr-scanner
-		  -->
-        QR Code Scanner
-
         <video></video>
         <button id="scan-btn">Scan</button>
 
+        <div id="result"></div>
+
         <script type="module">
+            // https://github.com/nimiq/qr-scanner
             import QrScanner from "./qr-scanner.min.js";
 
-            const qrScanner = new QrScanner(
-                document.querySelector("video"),
-                (result) => console.log("decoded qr code:", result),
-                {
-                    /* your options or returnDetailedScanResult: true if you're not specifying any other options */
-                }
-            );
+            function $(selector) {
+                return document.querySelector(selector);
+            }
+
+            const qrScanner = new QrScanner($("video"), onDetected, {
+                returnDetailedScanResult: true,
+            });
+
+            function onDetected(result) {
+                $("#result").innerText = result.data;
+                qrScanner.stop();
+            }
 
             function scan() {
                 qrScanner.start();
             }
 
-            document
-                .querySelector("#scan-btn")
-                .addEventListener("click", () => scan());
+            $("#scan-btn").addEventListener("click", () => scan());
         </script>
     </body>
 </html>
